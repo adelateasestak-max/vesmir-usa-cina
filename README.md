@@ -50,3 +50,12 @@ cd docs && python -m http.server 8000   # http://localhost:8000/
 - Každý automatický commit přidá do historie ~2,5 MB (`index.html` + `databaze.xlsx`), tj. ~20 MB/den. Pokud by repo rostlo moc, zřeď cron (např. `17 */6 * * *`) nebo `docs/databaze.xlsx` přidej do `.gitignore` (Pages ho dostanou i tak z artefaktu nasazení).
 - GitHub může naplánované workflow ve veřejném repu pozastavit po 60 dnech bez aktivity – pak stačí v *Actions* workflow znovu povolit.
 - Grafy i živý režim potřebují internet (CDN). Predikce jsou modelový odhad, ne fakt (viz metodika v dashboardu).
+
+
+## Podpora a licence
+
+Na webu je formulář k bezplatnému odběru novinek a patička se zdroji dat a licencemi.
+
+- **GCAT** (J. McDowell): [CC BY](https://creativecommons.org/licenses/by/4.0/), komerční použití s uvedením zdroje je povoleno. https://planet4589.org/space/gcat/
+- **CelesTrak** (T.S. Kelso): volně ke stažení, bez formální licence k redistribuci; platí [Usage Policy](https://celestrak.org/usage-policy.php) (GP nejvýš 1× za 2 h). Komerční přeposílání surových dat je vhodné nejdřív konzultovat s CelesTrakem.
+- **Launch Library 2** (The Space Devs): data lze použít a výstupy sdílet, bez přeposílání bez přidané hodnoty; uvedení zdroje je vítané. [Podmínky](https://github.com/TheSpaceDevs/Tutorials/blob/main/faqs/faq_TSD.md).

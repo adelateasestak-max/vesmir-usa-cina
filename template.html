@@ -23,8 +23,26 @@ th{background:#21262d}a{color:#79c0ff}h2{margin-top:28px}.warn{color:#e3b341}
 .ipanel{display:none;position:absolute;top:40px;left:8px;right:8px;z-index:21;background:#0d1117;border:1px solid #58a6ff;border-radius:8px;padding:10px 12px;font-size:14px;line-height:1.45;box-shadow:0 6px 20px #000a}
 .warnbox{border-color:#e3b341;background:#2b230f}.btn{background:#1f6feb;color:#fff;border:0;border-radius:6px;padding:8px 14px;cursor:pointer;font-size:14px}
 select{background:#0d1117;color:#e6edf3;border:1px solid #30363d;border-radius:6px;padding:6px;font-size:14px;max-width:560px}h3{margin:18px 0 8px}
+.support-banner{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;padding:12px 32px;background:#161b22;border-bottom:1px solid #30363d}
+.support-banner p{margin:0;font-size:14px;color:#c9d1d9;line-height:1.45}
+.cta{display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap}
+a.btn-sub,a.btn-free{display:inline-block;border-radius:8px;padding:9px 16px;font-size:14px;font-weight:600;text-decoration:none}
+a.btn-sub{background:#1f6feb;color:#fff;border:1px solid #1f6feb}
+a.btn-free{background:transparent;color:#79c0ff;border:1px solid #388bfd}
+a.btn-sub:hover{background:#388bfd}a.btn-free:hover{background:#1f3b73}
+.support-section{margin-top:36px;padding:22px 24px;background:linear-gradient(90deg,#1f3b73,#7a1f1f);border-radius:12px;border:1px solid #30363d}
+.support-section h2{margin:0 0 8px} .support-section p{margin:6px 0;line-height:1.5}
+.support-section .cta{margin-top:14px}
+footer.site-foot{padding:28px 32px 40px;border-top:1px solid #30363d;background:#0d1117;color:#8b949e;font-size:13px;line-height:1.6}
+footer.site-foot h3{color:#e6edf3;font-size:15px;margin:0 0 10px}footer.site-foot ul{margin:0;padding-left:18px}footer.site-foot li{margin:0 0 8px}
 </style></head><body>
 <header><h1>🚀 USA vs 🇨🇳 Čína ve vesmíru</h1><div id="sub" class="muted"></div><div style="margin-top:8px"><a href="databaze.xlsx" download>⬇ Stáhnout databázi (Excel)</a> · <a href="data/gp_sample.json">vzorek drah (JSON)</a></div></header>
+<div class="support-banner" id="podpora-banner">
+  <p><b>Podpoř projekt</b> · Měsíční report s komentářem za 99&nbsp;Kč, nebo odebírej novinky zdarma.</p>
+  <div class="cta">
+    <a class="btn-free" href="https://form.typeform.com/to/mK0GYv7g" target="_blank" rel="noopener">Odebírat zdarma</a>
+  </div>
+</div>
 <main>
 <div class="kpis" id="kpis"></div>
 <div class="grid">
@@ -75,7 +93,24 @@ select{background:#0d1117;color:#e6edf3;border:1px solid #30363d;border-radius:6
 <h2>Nadcházející starty (Launch Library 2)</h2><div class="card"><table id="upc"><tr><th>Datum (UTC)</th><th>Země</th><th>Mise</th><th>Poskytovatel</th><th>Stav</th></tr></table></div>
 <h2>Neúspěšné starty (poslední 2 roky)</h2><div class="card"><table id="fail"><tr><th>Datum (UTC)</th><th>Země</th><th>Raketa</th><th>Mise</th></tr></table></div>
 <h2>Metodika a zdroje</h2><div class="card muted" id="metod"></div>
+
+<div class="support-section" id="podpora">
+ <h2>Podpoř projekt / Měsíční report</h2>
+ <p>Dashboard zůstává volně přístupný. Kdo chce víc, může odebírat <b>měsíční report</b>: analýza startů, družic, konstelací, raket a predikcí s komentářem, <b>99&nbsp;Kč měsíčně</b>.</p>
+ <p>Přihlášení k platbě spustíme, jakmile bude dokončený účet ve Stripe (účet zatím nepřijímá platby). Mezitím se můžeš přihlásit k odběru novinek zdarma — ozveme se, až bude předplatné otevřené.</p>
+ <div class="cta"><a class="btn-free" href="https://form.typeform.com/to/mK0GYv7g" target="_blank" rel="noopener">Odebírat zdarma</a></div>
+</div>
 </main>
+
+<footer class="site-foot" id="licence">
+<h3>Zdroje dat a licence</h3>
+<ul>
+<li><b>GCAT</b> (Jonathan C. McDowell, <a href="https://planet4589.org/space/gcat/" target="_blank" rel="noopener">planet4589.org/space/gcat</a>) je pod licencí <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution (CC BY)</a>. Autor na svých stránkách výslovně uvádí, že data GCAT jsou CC-BY, takže je lze znovu použít a stavět na nich rozhraní. Komerční použití je při uvedení zdroje povoleno. Doporučená citace: McDowell, Jonathan C., 2020. General Catalog of Artificial Space Objects, https://planet4589.org/space/gcat.</li>
+<li><b>CelesTrak</b> (Dr. T.S. Kelso, <a href="https://celestrak.org/" target="_blank" rel="noopener">celestrak.org</a>) data volně poskytuje, ale <b>formální licenci k dalšímu šíření nestanovuje</b>. Platí <a href="https://celestrak.org/usage-policy.php" target="_blank" rel="noopener">Usage Policy</a>: stahovat jen potřebná data, jen jednou za aktualizaci (GP nejvýš 1× za 2&nbsp;h, preferovat CSV), při odpovědi jiné než HTTP 200 ihned přestat. Tento dashboard data ukládá do mezipaměti a návštěvníkům je nepřeposílá z CelesTraku přímo. Pro komerční redistribuci surových katalogů nebo službu, která je posílá dál, je vhodné nejdřív požádat CelesTrak o písemné stanovisko. Zdroj uvádíme.</li>
+<li><b>Launch Library 2</b> (The Space Devs, <a href="https://thespacedevs.com/llapi" target="_blank" rel="noopener">thespacedevs.com/llapi</a>) povoluje použití dat „jakýmkoli způsobem“ a sdílení výstupů; data se nemají přeposílat dál bez přidané hodnoty. Uvedení zdroje není povinné, ale je vítané. API je zdarma do 15 požadavků za hodinu (vyšší limit přes Patreon). Obrázky z LL2 mají různé licence a v tomto dashboardu je nepoužíváme. Podmínky: <a href="https://github.com/TheSpaceDevs/Tutorials/blob/main/faqs/faq_TSD.md" target="_blank" rel="noopener">Terms of use</a>.</li>
+</ul>
+</footer>
+
 <script>
 const S=/*__DATA__*/null;
 const US='#58a6ff',CN='#ff7b72',L={paper_bgcolor:'#161b22',plot_bgcolor:'#161b22',font:{color:'#e6edf3'},margin:{t:50,l:60,r:20,b:60},legend:{orientation:'h'}};
@@ -326,5 +361,6 @@ document.getElementById('metod').innerHTML=`<ul>
 <li><b>Křížová kontrola ${c.rok}</b> (Launch Library 2): SpaceX GCAT ${c.SpaceX.GCAT} vs LL2 ${c.SpaceX.LL2}; CASC GCAT ${c.CASC.GCAT} vs LL2 ${c.CASC.LL2}. Rozdíly vznikají klasifikací (např. suborbitální testy Starship, dceřiné firmy).</li>
 <li><b>Družice</b>: aktivní = v CelesTrak GP skupině „active“ (${S.aktivni_celkem_celestrak} objektů), země = SATCAT pole OWNER (US / PRC). Orbita z apogea/perigea/periody, typ odhadnut z názvu objektu (orientační).</li>
 <li><b>Nadcházející starty</b>: <a href="https://thespacedevs.com/llapi">Launch Library 2</a> (limit 15 dotazů/h, cache 6 h).</li>
+<li>Licence a podmínky komerčního použití zdrojů jsou v <a href="#licence">patičce</a>.</li>
 <li>Varování sanity kontroly: <span class="warn">${S.varovani.length?S.varovani.join('; '):'žádná'}</span></li></ul>`;
 </script></body></html>
