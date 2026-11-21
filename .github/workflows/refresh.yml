@@ -1,0 +1,68 @@
+name: Aktualizace dat a nasazení
+
+on:
+  schedule:
+    - cron: "17 */3 * * *"   # každé 3 h (UTC). CelesTrak: max 1x/2 h, LL2: max 15 dotazů/h -> jeden běh ~6 dotazů
+  workflow_dispatch: {}       # ruční spuštění v záložce Actions
+
+permissions:
+  contents: write   # commit docs/ zpět do repa
+  pages: write      # nasazení GitHub Pages
+  id-token: write
+
+concurrency:
+  group: refresh
+  cancel-in-progress: false
+
+env:
+  TZ: Europe/Prague   # časy v dashboardu a logu v pražském čase
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      # cache/ (stažená data + cache/attempts.json s časem posledních pokusů) se přenáší mezi běhy,
+      # takže program dodrží stáří cache (GCAT 24 h, CelesTrak GP 2 h, LL2 6 h) i 2h limit CelesTraku.
+      - name: Obnovit cache dat
+        uses: actions/cache@v4
+        with:
+          path: cache
+          key: space-data-${{ github.run_id }}
+          restore-keys: space-data-
+
+      - name: Refresh (update + report + export)
+        run: python main.py refresh
+
+      - name: Commit změn v docs/ a data/
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs data/stats.json
+          if git diff --cached --quiet; then echo "Žádné změny"; else
+            git commit -m "Automatická aktualizace dat $(date -u +'%Y-%m-%d %H:%M UTC')"
+            git push
+          fi
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+  deploy:
+    needs: refresh
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
