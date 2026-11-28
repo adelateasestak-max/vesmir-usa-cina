@@ -1,0 +1,216 @@
+{
+ "pozn": "Vysvětlivky pro veřejnost. Fakta ověřena 3. 11. 2026 z uvedených zdrojů (hlavně úvodní části článků Wikipedie a oficiální weby). Počty objektů v kartách se počítají živě z dat CelesTrak (SATCAT/GP) při každém `python main.py report`.",
+ "drahy": [
+  {
+   "kod": "LEO",
+   "nazev": "Nízká oběžná dráha (LEO)",
+   "vyska": "do ~2 000 km",
+   "text": "Nejblíž k Zemi. Družice tu oběhne Zemi zhruba za 1,5–2 hodiny (ISS ve výšce kolem 400 km za ~93 minut). Výhoda: krátká vzdálenost = ostré snímky, malé zpoždění signálu, snadnější a levnější dopravení. Nevýhoda: každá družice vidí jen malý kus Země, takže pro nepřetržité pokrytí jich je potřeba hodně.",
+   "zdroj": "https://en.wikipedia.org/wiki/Low_Earth_orbit"
+  },
+  {
+   "kod": "MEO",
+   "nazev": "Střední oběžná dráha (MEO)",
+   "vyska": "~2 000 až 35 786 km",
+   "text": "Mezi LEO a geostacionární dráhou. Jedna družice tu vidí velkou část Země, takže pro celý svět stačí desítky družic – proto tu létají navigační systémy GPS (~20 180 km) a BeiDou. Prochází zde Van Allenovy radiační pásy, proti kterým musí být elektronika chráněná.",
+   "zdroj": "https://en.wikipedia.org/wiki/Medium_Earth_orbit"
+  },
+  {
+   "kod": "GEO",
+   "nazev": "Geostacionární dráha (GEO)",
+   "vyska": "35 786 km nad rovníkem",
+   "text": "Družice tu obíhá stejně rychle, jak se Země otáčí, takže ze Země vypadá, že stojí na jednom místě na obloze. Anténu (např. satelitní TV) proto stačí jednou namířit a už se nemusí otáčet. Využívají ji komunikační a meteorologické družice. Myšlenku zpopularizoval spisovatel Arthur C. Clarke ve 40. letech, první družice na takové dráze startovala v roce 1963.",
+   "zdroj": "https://en.wikipedia.org/wiki/Geostationary_orbit"
+  },
+  {
+   "kod": "HEO",
+   "nazev": "Vysoce eliptická dráha (HEO)",
+   "vyska": "blízko Země i desítky tisíc km",
+   "text": "Protáhlá dráha: družice se k Zemi přiblíží a pak se vzdálí. Daleko od Země se pohybuje pomalu, takže dlouho „visí“ nad jedním regionem – hodí se pro severní oblasti, které geostacionární družice nad rovníkem vidí jen šikmo (příklad: dráha Molnija).",
+   "zdroj": "https://en.wikipedia.org/wiki/Molniya_orbit"
+  }
+ ],
+ "typy": [
+  {
+   "id": "komunikace",
+   "ikona": "📡",
+   "nazev": "Komunikační družice",
+   "kategorie": [],
+   "co": "Vesmírné „převaděče“: přijmou signál ze Země a pošlou ho jinam – televize, telefon, data, spojení s loděmi a letadly.",
+   "proc": "Spojí místa, kam nevedou kabely (oceány, hory, odlehlé oblasti), a jedna družice pokryje velké území.",
+   "zamer": "Myšlenku komunikačních družic na geostacionární dráze zpopularizoval ve 40. letech spisovatel Arthur C. Clarke; první družice na takové dráze odstartovala v roce 1963. Dnes jde o velký komerční byznys (TV, data) i vojenské spojení.",
+   "kdo_usa": "Komerční firmy (např. SpaceX, Amazon, mnoho operátorů GEO družic) a armáda USA.",
+   "kdo_cina": "Státní operátoři (např. China Satcom) a armáda; od 2022/2024 nové internetové sítě Guowang a Qianfan.",
+   "draha": "Klasicky GEO (anténa míří stále na jedno místo). Nové internetové sítě jsou v LEO kvůli menšímu zpoždění.",
+   "zdroje": [
+    "https://en.wikipedia.org/wiki/Geostationary_orbit",
+    "https://en.wikipedia.org/wiki/Communications_satellite"
+   ]
+  },
+  {
+   "id": "megakonstelace",
+   "ikona": "🛰️",
+   "nazev": "Mega-konstelace (satelitní internet)",
+   "kategorie": [
+    "Starlink",
+    "Kuiper",
+    "Qianfan",
+    "Guowang"
+   ],
+   "co": "Tisíce menších družic v nízké výšce, které společně fungují jako jedna síť a poskytují rychlý internet kdekoli na Zemi.",
+   "proc": "Blízko Země je malé zpoždění signálu (vhodné pro videohovory a hry). Každá družice ale vidí jen malé území, proto jich musí být tisíce.",
+   "zamer": "Starlink (SpaceX) startuje od 2019, plánovalo se téměř 12 000 družic s možným rozšířením na 42 000; dnes slouží v ~160 zemích a využívá se i vojensky (např. na Ukrajině). Amazon Leo (dříve Project Kuiper) má od 2020 povolení FCC na 3 236 družic. Čína staví dvě konkurenční sítě: Guowang (od 2022, plán přes 13 000 družic, civilní i vojenské využití) a Qianfan/Spacesail (od 2024, plán přes 15 000, 1. fáze 1 296).",
+   "kdo_usa": "SpaceX (Starlink), Amazon (Amazon Leo/Kuiper).",
+   "kdo_cina": "China SatNet (Guowang), Shanghai Spacecom Satellite Technology (Qianfan).",
+   "draha": "LEO (Starlink ~500–600 km; Guowang zatím ~1 150 km). Kritika: světelné znečištění oblohy pro astronomy a přeplnění oběžných drah.",
+   "zdroje": [
+    "https://en.wikipedia.org/wiki/Starlink",
+    "https://en.wikipedia.org/wiki/Amazon_Leo",
+    "https://en.wikipedia.org/wiki/Guowang",
+    "https://en.wikipedia.org/wiki/Qianfan"
+   ]
+  },
+  {
+   "id": "navigace",
+   "ikona": "🧭",
+   "nazev": "Navigační družice (GPS, BeiDou)",
+   "kategorie": [
+    "Navigace"
+   ],
+   "co": "Družice vysílají velmi přesný čas a svou polohu. Přijímač v telefonu nebo autě porovná signály z aspoň 4 družic a spočítá, kde se nachází.",
+   "proc": "Navigace, letectví, lodní doprava, zemědělství, ale i přesný čas pro banky a mobilní sítě. Přijímač nic nevysílá a nepotřebuje internet.",
+   "zamer": "GPS zahájilo ministerstvo obrany USA v roce 1973 jako vojenský systém; plná sestava 24 družic fungovala od 1993. Po sestřelení letadla Korean Air 007 (1983) prezident Reagan rozhodl zpřístupnit GPS civilistům. Čína chtěla nezávislost na americkém GPS: BeiDou-3 má globální pokrytí od července 2020.",
+   "kdo_usa": "GPS – vlastní a provozuje Vesmírné síly USA (Space Force); pro civilisty zdarma.",
+   "kdo_cina": "BeiDou – Čínská národní vesmírná agentura (CNSA); od 2023 uznán ICAO jako standard pro civilní letectví.",
+   "draha": "MEO (GPS ~20 180 km): jedna družice vidí velkou část Země, celý svět pokryje pár desítek družic. BeiDou-3 má 24 družic v MEO + 3 na skloněné geosynchronní a 3 na geostacionární dráze (lepší pokrytí Asie).",
+   "zdroje": [
+    "https://en.wikipedia.org/wiki/Global_Positioning_System",
+    "https://en.wikipedia.org/wiki/BeiDou",
+    "https://www.gps.gov/"
+   ]
+  },
+  {
+   "id": "pozorovani",
+   "ikona": "🌍",
+   "nazev": "Pozorování Země",
+   "kategorie": [
+    "Pozorování Země"
+   ],
+   "co": "„Fotoaparáty a senzory“ na oběžné dráze, které snímkují pevninu, oceány, mraky a atmosféru.",
+   "proc": "Úroda, lesy, povodně a požáry, mapy, klima, počasí, plánování měst.",
+   "zamer": "Americký Landsat (NASA + USGS) fotografuje Zemi nepřetržitě od 23. 7. 1972 – nejdelší souvislá řada družicových snímků. Čínský program Gaofen (CHEOS, schválen 2010) slouží zemědělství, krizovému řízení a životnímu prostředí; o novějších družicích Gaofen je zveřejněno málo a mohou mít i vojenské využití.",
+   "kdo_usa": "NASA, USGS, NOAA (počasí) a soukromé firmy (např. Planet, Maxar).",
+   "kdo_cina": "CNSA a státní instituce (Gaofen, Fengyun – počasí) a komerční firmy (např. Jilin).",
+   "draha": "Převážně LEO, často tzv. slunečně synchronní dráha přes póly (snímky vždy ve stejný místní čas = srovnatelné osvětlení). Meteorologické družice jsou i na GEO a sledují stále stejnou polokouli.",
+   "zdroje": [
+    "https://en.wikipedia.org/wiki/Landsat_program",
+    "https://en.wikipedia.org/wiki/Gaofen"
+   ]
+  },
+  {
+   "id": "vojenske",
+   "ikona": "🛡️",
+   "nazev": "Vojenské a zpravodajské družice",
+   "kategorie": [
+    "Vojenské/zpravodajské"
+   ],
+   "co": "Družice pro průzkum (optické i radarové snímky), odposlech signálů, včasné varování před raketami a vojenské spojení.",
+   "proc": "Státy chtějí vědět, co se děje na území protivníka, a mít spojení a navigaci i v konfliktu.",
+   "zamer": "V USA navrhuje, staví, vypouští a provozuje zpravodajské družice úřad NRO; v roce 2023 oznámil, že během dekády zečtyřnásobí počet družic. Čínské vojenské průzkumné družice nesou označení Yaogan (optické snímky, radar SAR, elektronický průzkum, sledování moře).",
+   "kdo_usa": "NRO, Vesmírné síly USA (Space Force), Agentura pro vývoj vesmírné architektury (SDA).",
+   "kdo_cina": "Čínská lidová osvobozenecká armáda (Yaogan, Shiyan, TJS aj.).",
+   "draha": "Průzkum v LEO (blízko = podrobné snímky), varování a spojení na GEO a HEO. Podrobnosti jsou tajné – v dashboardu je typ odhadnut jen podle názvu.",
+   "zdroje": [
+    "https://en.wikipedia.org/wiki/National_Reconnaissance_Office",
+    "https://en.wikipedia.org/wiki/Yaogan"
+   ]
+  },
+  {
+   "id": "veda",
+   "ikona": "🔭",
+   "nazev": "Vědecké družice a teleskopy",
+   "kategorie": [],
+   "co": "Teleskopy a přístroje, které zkoumají vesmír, Slunce nebo Zemi (gravitace, magnetické pole, záření).",
+   "proc": "Atmosféra rozmazává obraz hvězd a část světla (UV, rentgen) úplně pohltí. Nad atmosférou je výhled ostrý.",
+   "zamer": "Hubble (NASA + ESA) startoval 24. 4. 1990. Čína připravuje teleskop Xuntian (start plánován na 2027, raketa CZ-5B), který bude mít 300–350× větší zorné pole než Hubble a bude létat poblíž stanice Tiangong, aby se k ní mohl připojit kvůli údržbě.",
+   "kdo_usa": "NASA (Hubble, James Webb a další), univerzity.",
+   "kdo_cina": "Čínská akademie věd, CMSA (Xuntian), CNSA.",
+   "draha": "Často LEO (snadnější start a servis – Hubble obíhá v nízké oběžné dráze), některé teleskopy létají daleko od Země (James Webb u bodu L2, asi 1,5 milionu km).",
+   "zdroje": [
+    "https://en.wikipedia.org/wiki/Hubble_Space_Telescope",
+    "https://en.wikipedia.org/wiki/Xuntian",
+    "https://en.wikipedia.org/wiki/James_Webb_Space_Telescope"
+   ]
+  },
+  {
+   "id": "stanice",
+   "ikona": "🏠",
+   "nazev": "Kosmické stanice (ISS, Tiangong)",
+   "kategorie": [
+    "Kosmické stanice"
+   ],
+   "co": "Velké obyvatelné laboratoře, kde dlouhodobě žijí a pracují astronauti.",
+   "proc": "Výzkum ve stavu beztíže (lékařství, materiály, biologie), zkoušení techniky pro lety k Měsíci a Marsu, prestiž a spolupráce.",
+   "zamer": "ISS provozuje 5 agentur (NASA, Roscosmos, ESA, JAXA, CSA); lidé na ní žijí nepřetržitě od 2. 11. 2000. Čína byla od roku 2011 z účasti vyloučena (tzv. Wolfův dodatek v USA), proto postavila vlastní stanici Tiangong – jádro Tianhe startovalo v dubnu 2021, posádky po 3 lidech se střídají zhruba po 6 měsících.",
+   "kdo_usa": "NASA s partnery (ISS).",
+   "kdo_cina": "Čínská agentura pro pilotované lety CMSA (Tiangong).",
+   "draha": "LEO kolem 400 km: dost blízko, aby se tam dalo často létat s posádkou a zásobami, a pod radiačními pásy.",
+   "zdroje": [
+    "https://en.wikipedia.org/wiki/International_Space_Station",
+    "https://en.wikipedia.org/wiki/Tiangong_space_station"
+   ]
+  },
+  {
+   "id": "lode",
+   "ikona": "🚀",
+   "nazev": "Kosmické lodě (posádky a náklad)",
+   "kategorie": [],
+   "co": "Lodě, které vozí lidi a zásoby na stanice a zpět.",
+   "proc": "Bez nich by stanice nemohly fungovat – střídání posádek, jídlo, voda, vědecké přístroje.",
+   "zamer": "Crew Dragon (SpaceX) poprvé vynesl astronauty 30. 5. 2020 a vozí posádky i náklad k ISS. Čínská loď Shenzhou vychází z ruského Sojuzu; od roku 1999 letěla 23×, z toho 17× s posádkou (od 2003). Náklad na Tiangong vozí lodě Tianzhou.",
+   "kdo_usa": "SpaceX (Dragon) na zakázku NASA, dále Boeing (Starliner).",
+   "kdo_cina": "CMSA (Shenzhou, Tianzhou).",
+   "draha": "LEO – připojí se ke stanici a po misi se vrátí nebo shoří v atmosféře.",
+   "zdroje": [
+    "https://en.wikipedia.org/wiki/SpaceX_Dragon_2",
+    "https://en.wikipedia.org/wiki/Shenzhou_(spacecraft)"
+   ]
+  },
+  {
+   "id": "stupne",
+   "ikona": "🧯",
+   "nazev": "Horní stupně raket (R/B)",
+   "kategorie": [],
+   "satcat": "R/B",
+   "co": "Části raket, které dopravily družici až na oběžnou dráhu a pak tam často zůstaly. Jsou velké (několik metrů až desítky metrů) a nefunkční.",
+   "proc": "Raketa se skládá ze stupňů; poslední stupeň musí s nákladem dosáhnout oběžné rychlosti, takže se na dráhu dostane také.",
+   "zamer": "Mezinárodní doporučení (např. pravidlo 25 let) žádají, aby se stupně a družice po skončení mise dostaly z oběžné dráhy, nejlépe aby shořely v atmosféře. Moderní stupně se proto často řízeně navedou zpět.",
+   "kdo_usa": "Např. 2. stupně Falconu 9, Centaury (ULA).",
+   "kdo_cina": "Horní stupně raket Dlouhý pochod (CZ).",
+   "draha": "Hlavně LEO a přechodové dráhy ke GEO (GTO), kde mohou zůstat desítky let.",
+   "zdroje": [
+    "https://en.wikipedia.org/wiki/Multistage_rocket",
+    "https://en.wikipedia.org/wiki/Space_debris"
+   ]
+  },
+  {
+   "id": "odpad",
+   "ikona": "🗑️",
+   "nazev": "Kosmický odpad",
+   "kategorie": [],
+   "satcat": "DEB",
+   "co": "Nefunkční lidmi vyrobené předměty: mrtvé družice, vyhořelé stupně a hlavně úlomky po rozpadech a srážkách – i úlomek velikosti kuličky může při rychlosti ~7 km/s poškodit družici.",
+   "proc": "Vzniká výbuchy zbytků paliva, srážkami a testy protidružicových zbraní. Nikdo za jeho úklid neplatí (tzv. negativní externalita).",
+   "zamer": "Žádný – jde o vedlejší produkt. Největší oblak vytvořil čínský protidružicový test 11. 1. 2007 (zničení meteorologické družice Fengyun-1C): přes 3 000 sledovaných úlomků. 10. 2. 2009 se srazila americká Iridium 33 s nefunkční ruskou Kosmos 2251 (přes 2 000 velkých úlomků). Riziko řetězových srážek popsali vědci NASA Kessler a Cour-Palais v roce 1978 (Kesslerův syndrom).",
+   "kdo_usa": "Odpad „vlastní“ stát, jehož objekt se rozpadl – USA mají v katalogu tisíce úlomků.",
+   "kdo_cina": "Čína rovněž tisíce, velkou část z testu v roce 2007.",
+   "draha": "Nejvíc v LEO zhruba v 700–1 000 km (viz graf hustoty podle výšky), kde je atmosféra tak řídká, že úlomky brzdí jen velmi pomalu. Níže je atmosféra hustší, takže objekty spadnou a shoří mnohem dřív.",
+   "zdroje": [
+    "https://en.wikipedia.org/wiki/Space_debris",
+    "https://en.wikipedia.org/wiki/2007_Chinese_anti-satellite_missile_test",
+    "https://en.wikipedia.org/wiki/2009_satellite_collision",
+    "https://en.wikipedia.org/wiki/Kessler_syndrome"
+   ]
+  }
+ ]
+}

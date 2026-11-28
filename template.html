@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>USA vs Čína ve vesmíru – dashboard</title>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/satellite.js@5.0.0/dist/satellite.min.js"></script>
+<style>
+body{font-family:system-ui,Segoe UI,Arial,sans-serif;margin:0;background:#0d1117;color:#e6edf3}
+header{padding:24px 32px;background:linear-gradient(90deg,#1f3b73,#7a1f1f)}h1{margin:0 0 6px}
+main{padding:20px 32px;max-width:1400px;margin:auto}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.kpi{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:14px}.kpi b{font-size:28px;display:block}
+.us{color:#58a6ff}.cn{color:#ff7b72}.muted{color:#8b949e;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(560px,1fr));gap:16px;margin-top:16px}
+.card{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:12px}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{border-bottom:1px solid #30363d;padding:8px;text-align:left;vertical-align:top}
+th{background:#21262d}a{color:#79c0ff}h2{margin-top:28px}.warn{color:#e3b341}
+.xgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px}
+.xcard{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:12px 14px;font-size:14px;line-height:1.45}
+.xcard p{margin:6px 0}.xhead{display:flex;gap:10px;align-items:center;font-size:16px}.xicon{font-size:26px}
+.xcnt{margin:6px 0;font-size:13px}details summary{cursor:pointer;color:#79c0ff;margin-top:6px}
+.ibtn{position:absolute;top:8px;left:8px;z-index:20;width:26px;height:26px;border-radius:50%;border:1px solid #58a6ff;background:#0d1117;color:#58a6ff;font-weight:bold;cursor:pointer;font-size:14px;line-height:22px;padding:0}
+.ibtn:hover{background:#1f6feb;color:#fff}
+.ipanel{display:none;position:absolute;top:40px;left:8px;right:8px;z-index:21;background:#0d1117;border:1px solid #58a6ff;border-radius:8px;padding:10px 12px;font-size:14px;line-height:1.45;box-shadow:0 6px 20px #000a}
+.warnbox{border-color:#e3b341;background:#2b230f}.btn{background:#1f6feb;color:#fff;border:0;border-radius:6px;padding:8px 14px;cursor:pointer;font-size:14px}
+select{background:#0d1117;color:#e6edf3;border:1px solid #30363d;border-radius:6px;padding:6px;font-size:14px;max-width:560px}h3{margin:18px 0 8px}
+.support-banner{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;padding:12px 32px;background:#161b22;border-bottom:1px solid #30363d}
+.support-banner p{margin:0;font-size:14px;color:#c9d1d9;line-height:1.45}
+.cta{display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap}
+a.btn-sub,a.btn-free{display:inline-block;border-radius:8px;padding:9px 16px;font-size:14px;font-weight:600;text-decoration:none}
+a.btn-sub{background:#1f6feb;color:#fff;border:1px solid #1f6feb}
+a.btn-free{background:transparent;color:#79c0ff;border:1px solid #388bfd}
+a.btn-sub:hover{background:#388bfd}a.btn-free:hover{background:#1f3b73}
+.support-section{margin-top:36px;padding:22px 24px;background:linear-gradient(90deg,#1f3b73,#7a1f1f);border-radius:12px;border:1px solid #30363d}
+.support-section h2{margin:0 0 8px} .support-section p{margin:6px 0;line-height:1.5}
+.support-section .cta{margin-top:14px}
+footer.site-foot{padding:28px 32px 40px;border-top:1px solid #30363d;background:#0d1117;color:#8b949e;font-size:13px;line-height:1.6}
+footer.site-foot h3{color:#e6edf3;font-size:15px;margin:0 0 10px}footer.site-foot ul{margin:0;padding-left:18px}footer.site-foot li{margin:0 0 8px}
+</style></head><body>
+<header><h1>🚀 USA vs 🇨🇳 Čína ve vesmíru</h1><div id="sub" class="muted"></div><div style="margin-top:8px"><a href="databaze.xlsx" download>⬇ Stáhnout databázi (Excel)</a> · <a href="data/gp_sample.json">vzorek drah (JSON)</a></div></header>
+<div class="support-banner" id="podpora-banner">
+  <p><b>Podpoř projekt</b> · Měsíční report s komentářem za 99&nbsp;Kč, nebo odebírej novinky zdarma.</p>
+  <div class="cta">
+    <a class="btn-free" href="https://form.typeform.com/to/mK0GYv7g" target="_blank" rel="noopener">Odebírat zdarma</a>
+  </div>
+</div>
+<main>
+<div class="kpis" id="kpis"></div>
+<div class="grid">
+ <div class="card" id="g_starty"></div><div class="card" id="g_uspesnost"></div>
+ <div class="card" id="g_rakety_us"></div><div class="card" id="g_rakety_cn"></div>
+ <div class="card" id="g_orbity"></div><div class="card" id="g_kat"></div>
+ <div class="card" id="g_konst"></div><div class="card" id="g_reuse"></div>
+</div>
+<h2 id="vysvetleni">Co všechno obíhá kolem Země? <span class="muted" style="font-size:15px">(vysvětlení pro každého)</span></h2>
+<p class="muted">Klikni na kartu „Více“ pro podrobnosti. Počty jsou živě z dat CelesTrak; zdroje faktů jsou odkazy u každé karty.</p>
+<h3>Oběžné dráhy – kde co létá</h3>
+<div class="xgrid" id="ex_drahy"></div>
+<h3>Typy objektů na oběžné dráze</h3>
+<div class="xgrid" id="ex_typy"></div>
+
+<h2>Mapa orbit</h2><p class="muted" id="orb_note"></p>
+<div class="card" id="live_ctrl" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+ <button id="live_btn" class="btn">● Živě</button><span id="live_status" class="muted">Statický snímek z doby vygenerování. „Živě“ spočítá polohy vzorku družic v reálném čase (každou sekundu) přímo v prohlížeči.</span></div>
+<div class="card" id="g_globe" style="height:720px"></div>
+<div class="grid"><div class="card" id="g_altinc"></div><div class="card" id="g_orbshare"></div></div>
+<h2>Nosnost a cena raket</h2><p class="muted" id="rk_note"></p>
+<div class="grid"><div class="card" id="g_leo" style="height:620px"></div><div class="card" id="g_usdkg" style="height:620px"></div></div>
+<div class="card" style="margin-top:16px;overflow-x:auto"><table id="rk"><tr><th>Země</th><th>Raketa</th><th>Stav</th><th>LEO (kg)</th><th>GTO / TLI (kg)</th><th>Cena startu (mil. USD)</th><th>USD/kg (LEO)</th><th>Poznámka</th><th>Zdroje</th></tr></table></div>
+<h2 id="predikce">Predikce 2026–2035: scénáře od nejhoršího po nejlepší</h2>
+<div class="card warnbox"><b>⚠ Modelový odhad, ne fakt.</b> Křivky vycházejí z reálných historických dat v této databázi (trend = průměrný roční růst 2021–2026) a z jasně popsaných předpokladů. <b>Pravděpodobnosti scénářů jsou expertní odhad</b> autora prototypu, ne výsledek statistického výpočtu. <a href="#metodika_pred">Metodika ↓</a></div>
+<div class="card" id="pred_ctrl" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:16px;align-items:center">
+ <label>Scénář: <select id="scen"></select></label>
+ <span class="muted" id="scen_desc" style="flex:1;min-width:320px"></span>
+</div>
+<div class="card" id="g_p_pst" style="height:170px;margin-top:12px"></div>
+<div class="grid">
+ <div class="card" id="g_p_starty"></div><div class="card" id="g_p_aktivni"></div>
+ <div class="card" id="g_p_konst"></div><div class="card" id="g_p_leo"></div>
+</div>
+<h3>„Reálná“ vizualizace: jak by mohla vypadat oběžná dráha v roce…</h3>
+<div class="card" id="p3d_ctrl" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+ <button id="p3d_play" class="btn">▶ Přehrát 2026–2035</button>
+ <label>Rok: <input type="range" id="p3d_year" min="2026" max="2035" step="1" value="2026" style="width:320px"> <b id="p3d_ylab">2026</b></label>
+ <label><input type="checkbox" id="p3d_leo" checked> detail LEO</label>
+ <span class="muted" id="p3d_note"></span>
+</div>
+<div class="grid"><div class="card" id="g_p_3d" style="height:640px"></div><div class="card" id="g_p_profil" style="height:640px"></div></div>
+<div class="card" style="margin-top:16px;overflow-x:auto"><table id="scen_tab"><tr><th>Scénář</th><th>Pravděp.</th><th>Předpoklady</th><th>Starty USA / Čína<br>2030 · 2035</th><th>Aktivní družice USA / Čína<br>2030 · 2035</th><th>Objekty v LEO (všichni)<br>2030 · 2035</th></tr></table></div>
+<div class="card muted" id="metodika_pred" style="margin-top:12px"></div>
+
+<h2>Klíčové technologie a programy</h2><p class="muted">Jen ověřená fakta, každé s odkazem na zdroj (stav k datu vygenerování).</p>
+<div class="card"><table id="fakta"><tr><th>Oblast</th><th class="us">USA</th><th class="cn">Čína</th></tr></table></div>
+<h2>Nadcházející starty (Launch Library 2)</h2><div class="card"><table id="upc"><tr><th>Datum (UTC)</th><th>Země</th><th>Mise</th><th>Poskytovatel</th><th>Stav</th></tr></table></div>
+<h2>Neúspěšné starty (poslední 2 roky)</h2><div class="card"><table id="fail"><tr><th>Datum (UTC)</th><th>Země</th><th>Raketa</th><th>Mise</th></tr></table></div>
+<h2>Metodika a zdroje</h2><div class="card muted" id="metod"></div>
+
+<div class="support-section" id="podpora">
+ <h2>Podpoř projekt / Měsíční report</h2>
+ <p>Dashboard zůstává volně přístupný. Kdo chce víc, může odebírat <b>měsíční report</b>: analýza startů, družic, konstelací, raket a predikcí s komentářem, <b>99&nbsp;Kč měsíčně</b>.</p>
+ <p>Přihlášení k platbě spustíme, jakmile bude dokončený účet ve Stripe (účet zatím nepřijímá platby). Mezitím se můžeš přihlásit k odběru novinek zdarma — ozveme se, až bude předplatné otevřené.</p>
+ <div class="cta"><a class="btn-free" href="https://form.typeform.com/to/mK0GYv7g" target="_blank" rel="noopener">Odebírat zdarma</a></div>
+</div>
+</main>
+
+<footer class="site-foot" id="licence">
+<h3>Zdroje dat a licence</h3>
+<ul>
+<li><b>GCAT</b> (Jonathan C. McDowell, <a href="https://planet4589.org/space/gcat/" target="_blank" rel="noopener">planet4589.org/space/gcat</a>) je pod licencí <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution (CC BY)</a>. Autor na svých stránkách výslovně uvádí, že data GCAT jsou CC-BY, takže je lze znovu použít a stavět na nich rozhraní. Komerční použití je při uvedení zdroje povoleno. Doporučená citace: McDowell, Jonathan C., 2020. General Catalog of Artificial Space Objects, https://planet4589.org/space/gcat.</li>
+<li><b>CelesTrak</b> (Dr. T.S. Kelso, <a href="https://celestrak.org/" target="_blank" rel="noopener">celestrak.org</a>) data volně poskytuje, ale <b>formální licenci k dalšímu šíření nestanovuje</b>. Platí <a href="https://celestrak.org/usage-policy.php" target="_blank" rel="noopener">Usage Policy</a>: stahovat jen potřebná data, jen jednou za aktualizaci (GP nejvýš 1× za 2&nbsp;h, preferovat CSV), při odpovědi jiné než HTTP 200 ihned přestat. Tento dashboard data ukládá do mezipaměti a návštěvníkům je nepřeposílá z CelesTraku přímo. Pro komerční redistribuci surových katalogů nebo službu, která je posílá dál, je vhodné nejdřív požádat CelesTrak o písemné stanovisko. Zdroj uvádíme.</li>
+<li><b>Launch Library 2</b> (The Space Devs, <a href="https://thespacedevs.com/llapi" target="_blank" rel="noopener">thespacedevs.com/llapi</a>) povoluje použití dat „jakýmkoli způsobem“ a sdílení výstupů; data se nemají přeposílat dál bez přidané hodnoty. Uvedení zdroje není povinné, ale je vítané. API je zdarma do 15 požadavků za hodinu (vyšší limit přes Patreon). Obrázky z LL2 mají různé licence a v tomto dashboardu je nepoužíváme. Podmínky: <a href="https://github.com/TheSpaceDevs/Tutorials/blob/main/faqs/faq_TSD.md" target="_blank" rel="noopener">Terms of use</a>.</li>
+</ul>
+</footer>
+
+<script>
+const S=/*__DATA__*/null;
+const US='#58a6ff',CN='#ff7b72',L={paper_bgcolor:'#161b22',plot_bgcolor:'#161b22',font:{color:'#e6edf3'},margin:{t:50,l:60,r:20,b:60},legend:{orientation:'h'}};
+const lay=(t,x={})=>Object.assign({},L,{title:t},x);
+const last=S.roky.length-1, yr=S.roky[last];
+document.getElementById('sub').textContent=`Data: GCAT (J. McDowell), CelesTrak SATCAT + aktivní GP, Launch Library 2 · vygenerováno ${S.vygenerovano} · poslední start v datech ${S.posledni_start_v_datech} UTC`;
+const k=[[`Starty USA ${yr}`,S.starty['USA'][last],'us'],[`Starty Čína ${yr}`,S.starty['Čína'][last],'cn'],
+ ['Aktivní družice USA',S.aktivni['USA'],'us'],['Aktivní družice Čína',S.aktivni['Čína'],'cn'],
+ ['Starlink aktivní',S.konstelace.Starlink.aktivni,'us'],['Qianfan + Guowang',S.konstelace.Qianfan.aktivni+S.konstelace.Guowang.aktivni,'cn']];
+document.getElementById('kpis').innerHTML=k.map(([t,v,c])=>`<div class="kpi"><span class="muted">${t}</span><b class="${c}">${(v??'–').toLocaleString('cs-CZ')}</b></div>`).join('')+
+ `<div class="kpi"><span class="muted">Pozn.</span><span class="muted">Rok ${yr} je neúplný (do ${S.posledni_start_v_datech.slice(0,11)}).</span></div>`;
+Plotly.newPlot('g_starty',[{x:S.roky,y:S.starty['USA'],name:'USA',type:'bar',marker:{color:US}},{x:S.roky,y:S.starty['Čína'],name:'Čína',type:'bar',marker:{color:CN}}],lay('Orbitální starty za rok',{barmode:'group'}));
+Plotly.newPlot('g_uspesnost',[{x:S.roky,y:S.uspesnost_pct['USA'],name:'USA',mode:'lines+markers',line:{color:US}},{x:S.roky,y:S.uspesnost_pct['Čína'],name:'Čína',mode:'lines+markers',line:{color:CN}}],lay('Úspěšnost startů (%)',{yaxis:{range:[75,101]}}));
+const rb=(z,c,id)=>{const e=Object.entries(S.rakety[z]).reverse();Plotly.newPlot(id,[{y:e.map(a=>a[0]),x:e.map(a=>a[1]),type:'bar',orientation:'h',marker:{color:c}}],lay(`Nejpoužívanější rakety – ${z} (${S.obdobi_raket})`,{margin:{t:50,l:150,r:20,b:40}}))};
+rb('USA',US,'g_rakety_us');rb('Čína',CN,'g_rakety_cn');
+const orb=['LEO','MEO','GEO/GSO','HEO (eliptická)','jiná','neznámá'];
+Plotly.newPlot('g_orbity',['USA','Čína'].map(z=>({x:orb,y:orb.map(o=>S.orbity[z][o]||0),name:z,type:'bar',marker:{color:z=='USA'?US:CN}})),lay('Aktivní družice podle orbity (log)',{barmode:'group',yaxis:{type:'log'}}));
+const cats=[...new Set([...Object.keys(S.kategorie['USA']),...Object.keys(S.kategorie['Čína'])])];
+Plotly.newPlot('g_kat',['USA','Čína'].map(z=>({x:cats,y:cats.map(c=>S.kategorie[z][c]||0),name:z,type:'bar',marker:{color:z=='USA'?US:CN}})),lay('Aktivní družice podle typu (log, odhad dle názvu)',{barmode:'group',yaxis:{type:'log'},xaxis:{tickangle:-30,automargin:true},legend:{orientation:'h',y:1.1},margin:{t:80,l:60,r:20,b:110}}));
+const kn=Object.keys(S.konstelace);
+Plotly.newPlot('g_konst',[{x:kn,y:kn.map(n=>S.konstelace[n].aktivni),type:'bar',text:kn.map(n=>S.konstelace[n].aktivni),textposition:'outside',marker:{color:kn.map(n=>['Starlink','Kuiper'].includes(n)?US:CN)}}],lay('Mega-konstelace: aktivní družice (log)',{yaxis:{type:'log',tickvals:[100,300,1000,3000,10000,30000],ticktext:['100','300','1 000','3 000','10 000','30 000'],range:[2,4.4]}}));
+const ry=Object.keys(S.falcon_reuse);
+Plotly.newPlot('g_reuse',[{x:ry,y:ry.map(y=>S.falcon_reuse[y].lety-S.falcon_reuse[y].reuse),name:'nový booster',type:'bar',marker:{color:'#30363d'}},{x:ry,y:ry.map(y=>S.falcon_reuse[y].reuse),name:'znovu použitý booster',type:'bar',marker:{color:US}}],lay('Falcon 9/Heavy: znovupoužití 1. stupně',{barmode:'stack'}));
+const esc=s=>String(s??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+document.getElementById('fakta').innerHTML+=S.fakta.map(f=>`<tr><td><b>${esc(f.oblast)}</b></td><td>${esc(f.usa)} <a href="${f.usa_zdroj}" target="_blank">[zdroj]</a></td><td>${esc(f.cina)} <a href="${f.cina_zdroj}" target="_blank">[zdroj]</a></td></tr>`).join('');
+document.getElementById('upc').innerHTML+=S.nadchazejici.map(u=>`<tr><td>${u.net.replace('T',' ').slice(0,16)}</td><td class="${u.zeme=='USA'?'us':'cn'}">${u.zeme}</td><td>${esc(u.nazev)}</td><td>${esc(u.poskytovatel)}</td><td>${esc(u.status)}</td></tr>`).join('');
+document.getElementById('fail').innerHTML+=S.selhani_posledni.map(u=>`<tr><td>${esc(u.Launch_Date)}</td><td class="${u.zeme=='USA'?'us':'cn'}">${u.zeme}</td><td>${esc(u.raketa)}</td><td>${esc(u.Mission)}</td></tr>`).join('');
+// ---- mapa orbit
+const OM=S.orbit_map;
+if(OM){
+ const GC={USA_starlink:'#1f6feb',USA_ostatni:US,'Čína':CN}, GN={USA_starlink:'USA – Starlink',USA_ostatni:'USA – ostatní','Čína':'Čína'};
+ const pc=OM.pocty;
+ document.getElementById('orb_note').textContent=`Polohy vypočtené modelem SGP4 z CelesTrak GP dat pro ${OM.cas_utc.replace('T',' ').slice(0,16)} UTC. Vzorek pro rychlost: `+Object.keys(pc).map(g=>`${GN[g]} ${pc[g].ve_vzorku.toLocaleString('cs-CZ')} z ${pc[g].celkem.toLocaleString('cs-CZ')}`).join(' · ')+'. Myší otáčej, kolečkem přibližuj; legendou skryješ skupiny.';
+ const R=6371,N=40,sx=[],sy=[],sz=[];
+ for(let i=0;i<=N;i++){const th=Math.PI*i/N;const rx=[],ry=[],rz=[];for(let j=0;j<=N;j++){const ph=2*Math.PI*j/N;rx.push(R*Math.sin(th)*Math.cos(ph));ry.push(R*Math.sin(th)*Math.sin(ph));rz.push(R*Math.cos(th));}sx.push(rx);sy.push(ry);sz.push(rz);}
+ const earth={type:'surface',x:sx,y:sy,z:sz,surfacecolor:sz.map(r=>r.map(v=>v)),cmin:-R,cmax:R,showscale:false,colorscale:[[0,'#1d4e89'],[0.5,'#2f7fb8'],[1,'#e6f0ff']],opacity:1,lighting:{ambient:0.8,diffuse:0.5},hoverinfo:'skip',name:'Země',showlegend:false};
+ const tr=Object.keys(GC).map(g=>{const b=OM.body.filter(p=>p.g==g);return {type:'scatter3d',mode:'markers',name:GN[g],x:b.map(p=>p.x),y:b.map(p=>p.y),z:b.map(p=>p.zz),
+   text:b.map(p=>`${p.n}<br>${p.k} · ${p.o}<br>výška ${p.alt.toLocaleString('cs-CZ')} km · sklon ${p.inc}°`),hoverinfo:'text',marker:{size:g=='USA_starlink'?1.5:2.2,color:GC[g],opacity:.75}}});
+ const ax={visible:false,range:[-45000,45000]};
+ Plotly.newPlot('g_globe',[earth,...tr],lay('3D mapa: aktivní družice USA a Číny (LEO u Země, GEO prstenec ~36 000 km)',{scene:{xaxis:ax,yaxis:ax,zaxis:ax,aspectmode:'cube',bgcolor:'#0d1117',camera:{eye:{x:0.9,y:0.9,z:0.5}}},legend:{orientation:'h',itemsizing:'constant',y:0.02,x:0.02,font:{size:14}},
+  updatemenus:[{type:'buttons',direction:'right',x:0.98,xanchor:'right',y:1.0,bgcolor:'#c9d1d9',bordercolor:'#8b949e',font:{color:'#0d1117'},buttons:[
+   {label:'Celé (do GEO)',method:'relayout',args:[{'scene.xaxis.range':[-45000,45000],'scene.yaxis.range':[-45000,45000],'scene.zaxis.range':[-45000,45000]}]},
+   {label:'Detail LEO',method:'relayout',args:[{'scene.xaxis.range':[-9500,9500],'scene.yaxis.range':[-9500,9500],'scene.zaxis.range':[-9500,9500]}]}]}],margin:{t:50,l:0,r:0,b:0},height:700}));
+ Plotly.newPlot('g_altinc',Object.keys(GC).map(g=>{const b=OM.body.filter(p=>p.g==g);return {type:'scattergl',mode:'markers',name:GN[g],x:b.map(p=>p.inc),y:b.map(p=>Math.max(p.alt,150)),text:b.map(p=>p.n),marker:{size:4,color:GC[g],opacity:.6}}}),
+   lay('Výška vs sklon dráhy (vzorek)',{legend:{orientation:'h',y:1.08},margin:{t:80,l:60,r:20,b:60},xaxis:{title:'sklon (°)'},yaxis:{title:'okamžitá výška (km, log)',type:'log'}}));
+}
+const orb2=['LEO','MEO','GEO/GSO','HEO (eliptická)','jiná','neznámá'];
+Plotly.newPlot('g_orbshare',orb2.map((o,i)=>({type:'bar',orientation:'h',name:o,y:['USA','Čína'],x:['USA','Čína'].map(z=>100*(S.orbity[z][o]||0)/S.aktivni[z]),
+  textposition:'none',text:['USA','Čína'].map(z=>(S.orbity[z][o]||0).toLocaleString('cs-CZ')),hovertemplate:'%{y} '+o+': %{text} (%{x:.1f} %)<extra></extra>'})),lay('Rozdělení aktivních družic podle orbity (%, všechny družice)',{barmode:'stack',xaxis:{title:'%',range:[0,100]},legend:{orientation:'h',entrywidth:120,traceorder:'normal',y:-0.18}}));
+// ---- rakety
+const RK=S.rakety_param||[];
+document.getElementById('rk_note').textContent=S.rakety_pozn||'';
+const fmt=v=>v==null?'–':Number(v).toLocaleString('cs-CZ');
+const rng=(a,b)=>a==null?'–':(a==b?fmt(a):`${fmt(a)}–${fmt(b)}`);
+const rs=[...RK].sort((a,b)=>a.leo_kg-b.leo_kg);
+Plotly.newPlot('g_leo',[{type:'bar',orientation:'h',y:rs.map(r=>r.raketa+(r.nejiste?' *':'')),x:rs.map(r=>r.leo_kg),marker:{color:rs.map(r=>r.zeme=='USA'?US:CN),opacity:rs.map(r=>/vývoj|plán|test/.test(r.stav)?0.5:1)},
+  text:rs.map(r=>fmt(r.leo_kg)+' kg'),textposition:'outside',hovertemplate:'%{y}: %{x:,} kg LEO<extra></extra>'}],
+  lay('Nosnost na LEO (kg, log; průhledné = vývoj/plán/test, * nejisté)',{xaxis:{type:'log',range:[2.3,5.6]},margin:{t:50,l:230,r:40,b:40},showlegend:false}));
+const rc=RK.filter(r=>r.usd_za_kg_min!=null).sort((a,b)=>b.usd_za_kg_max-a.usd_za_kg_max);
+Plotly.newPlot('g_usdkg',[{type:'bar',orientation:'h',y:rc.map(r=>`${r.raketa}${r.nejiste?' *':''}  <b>${rng(r.usd_za_kg_min,r.usd_za_kg_max)}</b>`),x:rc.map(r=>r.usd_za_kg_min),
+  error_x:{type:'data',symmetric:false,array:rc.map(r=>r.usd_za_kg_max-r.usd_za_kg_min),arrayminus:rc.map(r=>0),color:'#e6edf3'},
+  marker:{color:rc.map(r=>r.zeme=='USA'?US:CN)},text:rc.map(r=>rng(r.usd_za_kg_min,r.usd_za_kg_max)+' $/kg'),textposition:'none',hovertemplate:'%{y}: %{text}<extra></extra>'}],
+  lay('Cena za kg na LEO (USD/kg, log; čára = rozpětí)',{xaxis:{type:'log',range:[2.8,4.5],title:'USD/kg'},margin:{t:50,l:330,r:30,b:50},showlegend:false}));
+const lnk=u=>(u||'').split(' ; ').filter(Boolean).map((x,i)=>{const url=x.split(' ')[0];return `<a href="${url}" target="_blank">[${i+1}]</a>`}).join(' ');
+document.getElementById('rk').innerHTML+=RK.map(r=>`<tr><td class="${r.zeme=='USA'?'us':'cn'}">${r.zeme}</td><td><b>${esc(r.raketa)}</b>${r.nejiste?' <span class="warn" title="odhad / projektová hodnota">*</span>':''}</td><td>${esc(r.stav)}</td>
+<td>${fmt(r.leo_kg)}${r.leo_pozn?'<br><span class="muted">'+esc(r.leo_pozn)+'</span>':''}</td><td>${fmt(r.gto_kg)} ${r.gto_kg?'<span class="muted">'+r.gto_typ+'</span>':''}</td>
+<td>${rng(r.cena_musd_min,r.cena_musd_max)}${r.cena_rok?'<br><span class="muted">'+esc(r.cena_rok)+'</span>':''}</td><td>${rng(r.usd_za_kg_min,r.usd_za_kg_max)}</td>
+<td class="muted">${esc(r.poznamka)}</td><td>nosnost ${lnk(r.zdroj_nosnost)}${r.zdroj_cena?'<br>cena '+lnk(r.zdroj_cena):''}</td></tr>`).join('');
+// ================= ℹ INFO =================
+const INFO={
+ g_starty:'Kolik orbitálních startů (pokusů dostat něco na oběžnou dráhu) provedly USA a Čína v každém roce. Vyšší sloupec = víc startů. Poslední rok je neúplný.',
+ g_uspesnost:'Kolik procent startů v daném roce uspělo. 100 % = žádné selhání. Při malém počtu startů stačí jedno selhání na velký propad.',
+ g_rakety_us:'Které americké rakety letěly nejčastěji za posledních ~5 let. Falcon 9 (SpaceX) výrazně dominuje díky znovupoužitelnému 1. stupni.',
+ g_rakety_cn:'Které čínské rakety letěly nejčastěji. „CZ“ = Dlouhý pochod (Chang Zheng), státní rakety; ostatní jsou komerční firmy.',
+ g_orbity:'Kolik aktivních družic je na které dráze (LEO nízká, MEO střední, GEO geostacionární, HEO eliptická). Osa je logaritmická: každá čára = 10× víc. Vysvětlení drah viz sekce „Co obíhá kolem Země“.',
+ g_kat:'Aktivní družice podle účelu. Typ je odhadnut jen podle názvu objektu (např. STARLINK, BEIDOU, YAOGAN), takže je orientační. Logaritmická osa.',
+ g_konst:'Mega-konstelace = tisíce internetových družic v LEO. Starlink (SpaceX) a Kuiper/Amazon Leo (USA) vs Guowang a Qianfan (Čína). Logaritmická osa.',
+ g_reuse:'Kolik letů Falconu 9/Heavy použilo už dříve letěný první stupeň (modře). Znovupoužití výrazně zlevňuje starty.',
+ g_globe:'3D poloha aktivních družic (vypočteno z drah). Tlačítko „Živě“ přepne na pohyb v reálném čase: vzorek ~1 500 družic + ISS a Tiangong (žluté kosočtverce), přepočet každou sekundu. Hustý oblak u Země = LEO, prstenec daleko = GEO. Otáčej myší, přepínač „Detail LEO“ přiblíží okolí Země.',
+ g_altinc:'Každá tečka = družice. Vodorovně sklon dráhy k rovníku (0° = nad rovníkem, 90° = přes póly, ~98° = slunečně synchronní), svisle výška. Shluky ukazují „dálnice“ na obloze.',
+ g_orbshare:'Jaký podíl aktivních družic dané země je na které dráze (v %). USA mají kvůli Starlinku skoro vše v LEO.',
+ g_leo:'Kolik kg unese raketa na nízkou oběžnou dráhu. Průhledné = ve vývoji/plán, * = nejisté/projektové číslo.',
+ g_usdkg:'Orientační cena za 1 kg na LEO = cena startu / nosnost. Nižší = levnější. Skutečné mise bývají dražší (raketa nebývá plně vytížena).',
+ g_p_pst:'Pravděpodobnost jednotlivých scénářů (expertní odhad, součet 100 %). Nejpravděpodobnější je nominální vývoj.',
+ g_p_starty:'Plná čára do 2026 = skutečnost (2026 přepočteno na celý rok). Dál = scénáře: tenké čáry všechny scénáře, tlustá vybraný scénář, bílá čárkovaná vážený průměr. USA plná, Čína tečkovaná.',
+ g_p_aktivni:'Počet aktivních družic v čase. Do roku 2025 je historie = všechny družice na dráze podle katalogu (včetně nefunkčních), bod 2026 = dnešní aktivní. Dál scénáře.',
+ g_p_konst:'Vývoj 4 mega-konstelací ve vybraném scénáři. Vodorovné tečkované čáry = veřejně oznámené plány (Starlink ~12 000, Kuiper 3 236, Guowang 13 000, Qianfan 15 000).',
+ g_p_leo:'Sledované objekty v LEO od všech států: družice, horní stupně raket a úlomky. Skoky v historii: čínský test ASAT 2007, srážka Iridium–Kosmos 2009, ruský test ASAT 2021. Dál vybraný scénář (čárkovaně) a celkem pro všechny scénáře.',
+ g_p_3d:'Simulace hustoty: tečky = družice USA a Číny (1 tečka = 10 družic) ve vybraném roce a scénáři. Budoucí družice jsou „naklonované“ z dnešních drah (otočené kolem osy Země) – jde o ilustraci počtu, ne o skutečné budoucí dráhy.',
+ g_p_profil:'Dnešní skutečná hustota LEO podle výšky (všechny státy, katalog CelesTrak). Nejplnější pás kolem 450–550 km = hlavně Starlink; úlomky se drží hlavně v 700–1 000 km, kde je atmosféra tak řídká, že je brzdí jen pomalu.',
+ fakta:'Ověřená fakta o hlavních programech USA a Číny, každé s odkazem na zdroj.',
+ rk:'Tabulka nosnosti a cen. Čísla jen se zdrojem; * = odhad nebo projektová hodnota.',
+ upc:'Nejbližší plánované starty z databáze Launch Library 2 (data se mohou měnit).',
+ fail:'Neúspěšné starty za poslední 2 roky podle katalogu GCAT.',
+ scen_tab:'Souhrn scénářů: předpoklady a klíčová čísla pro roky 2030 a 2035.'
+};
+function addInfo(id){
+ const el=document.getElementById(id); if(!el||!INFO[id]) return;
+ const host=el.tagName==='TABLE'?el.parentElement:el; host.style.position='relative';
+ const b=document.createElement('button'); b.className='ibtn'; b.textContent='ℹ'; b.title='Co to ukazuje?';
+ const pnl=document.createElement('div'); pnl.className='ipanel'; pnl.innerHTML=esc(INFO[id])+' <a href="#" class="iclose">zavřít</a>';
+ b.onclick=e=>{e.preventDefault();pnl.style.display=pnl.style.display==='block'?'none':'block'};
+ pnl.querySelector('.iclose').onclick=e=>{e.preventDefault();pnl.style.display='none'};
+ host.appendChild(b); host.appendChild(pnl);
+}
+// ================= VYSVĚTLIVKY =================
+const EX=S.vysvetlivky;
+if(EX){
+ const dp=EX.drahy_pocet||{};
+ document.getElementById('ex_drahy').innerHTML=EX.drahy.map(d=>{const k=d.kod=='GEO'?'GEO/GSO':(d.kod=='HEO'?'HEO (eliptická)':d.kod);
+  return `<div class="xcard"><div class="xhead"><span class="xicon">🪐</span><div><b>${esc(d.nazev)}</b><br><span class="muted">${esc(d.vyska)}</span></div></div>
+  <div class="xcnt"><span class="us">USA ${fmt(dp.USA?.[k]||0)}</span> · <span class="cn">Čína ${fmt(dp['Čína']?.[k]||0)}</span> <span class="muted">aktivních</span></div>
+  <p>${esc(d.text)}</p><a href="${d.zdroj}" target="_blank" class="muted">zdroj</a></div>`}).join('');
+ document.getElementById('ex_typy').innerHTML=EX.typy.map(t=>`<div class="xcard" id="ex_${t.id}"><div class="xhead"><span class="xicon">${t.ikona}</span><b>${esc(t.nazev)}</b></div>
+  ${t.pocet?`<div class="xcnt"><span class="us">USA ${fmt(t.pocet.USA)}</span> · <span class="cn">Čína ${fmt(t.pocet['Čína'])}</span> <span class="muted">${esc(t.pocet_pozn)}</span></div>`:'<div class="xcnt muted">počet nelze z názvů spolehlivě určit</div>'}
+  <p><b>Co to je:</b> ${esc(t.co)}</p>
+  <details><summary>Více: proč, záměr, kdo, jaká dráha</summary>
+   <p><b>Proč existuje / k čemu slouží:</b> ${esc(t.proc)}</p><p><b>Záměr a historie:</b> ${esc(t.zamer)}</p>
+   <p><b class="us">USA:</b> ${esc(t.kdo_usa)}<br><b class="cn">Čína:</b> ${esc(t.kdo_cina)}</p><p><b>Proč na této dráze:</b> ${esc(t.draha)}</p>
+   <p class="muted">Zdroje: ${t.zdroje.map((u,i)=>`<a href="${u}" target="_blank">[${i+1}]</a>`).join(' ')}</p></details></div>`).join('');
+}
+// ================= PREDIKCE =================
+const P=S.predikce;
+if(P){
+ const SC=[...P.scenare,P.vazeny], YR=P.roky, H=P.historie;
+ const sel=document.getElementById('scen');
+ sel.innerHTML=SC.map(s=>`<option value="${s.id}">${esc(s.nazev)}${s.pst!=null?' – '+s.pst+' %':''}</option>`).join('');
+ sel.value='S3';
+ const get=id=>SC.find(s=>s.id==id);
+ const hy=S.roky.filter(y=>y<=2025), hU=hy.map(y=>S.starty.USA[S.roky.indexOf(y)]), hC=hy.map(y=>S.starty['Čína'][S.roky.indexOf(y)]);
+ Plotly.newPlot('g_p_pst',[...P.scenare].map(s=>({type:'bar',orientation:'h',y:['pravděpodobnost'],x:[s.pst],name:`${s.id} ${s.pst} %`,marker:{color:s.barva},text:[`${s.id} · ${s.pst} %`],textposition:'inside',insidetextanchor:'middle',hovertemplate:esc(s.nazev)+': %{x} %<extra></extra>'})),
+  lay('Pravděpodobnost scénářů (expertní odhad, součet 100 %)',{barmode:'stack',showlegend:false,xaxis:{range:[0,100],ticksuffix:' %'},yaxis:{visible:false},margin:{t:40,l:20,r:20,b:30},height:160}));
+ function lines(metric,hist,title,yt,extra={}){
+  const cur=sel.value, tr=[];
+  ['USA','Čína'].forEach(z=>{const col=z=='USA'?US:CN, dash=z=='USA'?'solid':'dot';
+   if(hist) tr.push({x:hist.x,y:hist[z],name:`${z} – historie`,mode:'lines+markers',line:{color:col,width:3,dash},marker:{size:4}});
+   P.scenare.forEach(s=>{const on=s.id==cur;tr.push({x:YR,y:s[metric][z],name:`${z} ${s.id}`,mode:'lines',showlegend:on,line:{color:on?col:s.barva,width:on?4:1.2,dash},opacity:on?1:.45,hovertemplate:`${z} ${esc(s.nazev)}<br>%{x}: %{y:,}<extra></extra>`})});
+   const w=P.vazeny;tr.push({x:YR,y:w[metric][z],name:`${z} vážený průměr`,mode:'lines',line:{color:'#ffffff',width:2,dash:'dash'},showlegend:cur=='VAZ'||z=='USA',hovertemplate:`${z} vážený průměr<br>%{x}: %{y:,}<extra></extra>`});
+  });
+  if(cur=='VAZ') tr.forEach(t=>{if(/vážený/.test(t.name)){t.line.width=4}});
+  Plotly.react('g_p_'+metric,tr,lay(title,Object.assign({yaxis:{title:yt},legend:{orientation:'h',y:-0.18},margin:{t:50,l:70,r:20,b:90},shapes:[{type:'line',x0:2026,x1:2026,yref:'paper',y0:0,y1:1,line:{color:'#8b949e',dash:'dot',width:1}}],annotations:[{x:2026,yref:'paper',y:1.02,text:'dnes',showarrow:false,font:{color:'#8b949e',size:11}}]},extra)));
+ }
+ function konst(){
+  const s=get(sel.value), cols={Starlink:US,Kuiper:'#a5d6ff',Guowang:CN,Qianfan:'#ffb3ad'}, tr=[];
+  Object.keys(P.plany).forEach(k=>{tr.push({x:YR,y:s.konstelace[k],name:k,mode:'lines+markers',line:{color:cols[k],width:3}});
+   tr.push({x:[YR[0],YR[YR.length-1]],y:[P.plany[k].plan,P.plany[k].plan],name:`${k} plán`,mode:'lines',line:{color:cols[k],dash:'dot',width:1},showlegend:false,hovertemplate:`${k}: plán ${fmt(P.plany[k].plan)} (${esc(P.plany[k].pozn)})<extra></extra>`})});
+  Plotly.react('g_p_konst',tr,lay(`Mega-konstelace – ${s.id} (tečkovaně = oficiální plán)`,{yaxis:{title:'aktivní družice',type:'log',tickvals:[100,300,1000,3000,10000,30000],ticktext:['100','300','1 000','3 000','10 000','30 000']},legend:{orientation:'h',y:-0.18},margin:{t:50,l:70,r:20,b:80}}));
+ }
+ function leo(){
+  const s=get(sel.value), hx=H.roky, tr=[], C={PAY:'#3fb950','R/B':'#e3b341',DEB:'#f85149'}, N={PAY:'družice (i nefunkční)','R/B':'horní stupně raket',DEB:'úlomky (odpad)'};
+  ['PAY','R/B','DEB'].forEach(t=>tr.push({x:[...hx,2026],y:[...H.leo[t],H.leo_dnes[t]],name:N[t]+' – historie',stackgroup:'h',line:{color:C[t]},fillcolor:C[t]+'99'}));
+  ['PAY','R/B','DEB'].forEach(t=>tr.push({x:YR,y:s.leo[t],name:N[t]+' – '+s.id,stackgroup:'p',line:{color:C[t],dash:'dash'},fillcolor:C[t]+'40'}));
+  P.scenare.forEach(q=>tr.push({x:YR,y:q.leo.celkem,name:`celkem ${q.id}`,mode:'lines',line:{color:q.barva,width:q.id==s.id?3:1},showlegend:false,hovertemplate:`celkem ${esc(q.nazev)}<br>%{x}: %{y:,}<extra></extra>`}));
+  Plotly.react('g_p_leo',tr,lay('Objekty v LEO (všechny státy): historie a scénáře',{yaxis:{title:'sledované objekty'},legend:{orientation:'h',y:-0.18,font:{size:11}},margin:{t:50,l:70,r:20,b:110}}));
+ }
+ // profil hustoty (reálná data)
+ const PR=H.profil;
+ Plotly.newPlot('g_p_profil',[['PAY','#3fb950','družice'],['R/B','#e3b341','horní stupně'],['DEB','#f85149','úlomky']].map(([t,c,n])=>({type:'bar',orientation:'h',y:PR.h.map(h=>h+25),x:PR[t],name:n,marker:{color:c}})),
+  lay('Dnešní hustota LEO podle výšky (všechny státy, pásma po 50 km)',{barmode:'stack',yaxis:{title:'průměrná výška (km)',range:[150,2000]},xaxis:{title:'počet objektů',type:'log'},legend:{orientation:'h',y:-0.12},margin:{t:50,l:70,r:20,b:80}}));
+ // 3D simulace
+ const B=S.orbit_map?S.orbit_map.body:[];
+ const G3={Starlink:{b:B.filter(p=>p.k=='Starlink'),c:'#1f6feb'},Kuiper:{b:B.filter(p=>p.k=='Kuiper'),c:'#a5d6ff'},'USA ostatní':{b:B.filter(p=>p.z=='USA'&&p.k!='Starlink'&&p.k!='Kuiper'),c:US},
+  'Čína Guowang+Qianfan':{b:B.filter(p=>p.k=='Guowang'||p.k=='Qianfan'),c:'#ffb3ad'},'Čína ostatní':{b:B.filter(p=>p.z=='Čína'&&p.k!='Guowang'&&p.k!='Qianfan'),c:CN}};
+ const SCALE=10;
+ function counts(s,i){const k=s.konstelace;return {Starlink:k.Starlink[i],Kuiper:k.Kuiper[i],'USA ostatní':s.aktivni.USA[i]-k.Starlink[i]-k.Kuiper[i],'Čína Guowang+Qianfan':k.Guowang[i]+k.Qianfan[i],'Čína ostatní':s.aktivni['Čína'][i]-k.Guowang[i]-k.Qianfan[i]}}
+ function rnd(seed){return ()=>{seed=(seed*1664525+1013904223)%4294967296;return seed/4294967296}}
+ const R0=6371,NS=30,ex=[],ey=[],ez=[];for(let i=0;i<=NS;i++){const th=Math.PI*i/NS,a=[],b=[],c=[];for(let j=0;j<=NS;j++){const ph=2*Math.PI*j/NS;a.push(R0*Math.sin(th)*Math.cos(ph));b.push(R0*Math.sin(th)*Math.sin(ph));c.push(R0*Math.cos(th))}ex.push(a);ey.push(b);ez.push(c)}
+ const earth3={type:'surface',x:ex,y:ey,z:ez,surfacecolor:ez,cmin:-R0,cmax:R0,showscale:false,colorscale:[[0,'#1d4e89'],[0.5,'#2f7fb8'],[1,'#e6f0ff']],hoverinfo:'skip',showlegend:false,lighting:{ambient:0.8}};
+ function draw3d(){
+  const s=get(sel.value), y=+document.getElementById('p3d_year').value, i=YR.indexOf(y), cn=counts(s,i), r=rnd(12345), tr=[earth3];
+  document.getElementById('p3d_ylab').textContent=y;
+  let tot=0;
+  Object.entries(G3).forEach(([g,o])=>{const n=Math.max(0,Math.round(cn[g]/SCALE)), xs=[],ys=[],zs=[];tot+=cn[g];
+   if(o.b.length) for(let j=0;j<n;j++){const p=o.b[j%o.b.length], a=j<o.b.length?0:r()*2*Math.PI, ca=Math.cos(a), sa=Math.sin(a);xs.push(p.x*ca-p.y*sa);ys.push(p.x*sa+p.y*ca);zs.push(p.zz)}
+   tr.push({type:'scatter3d',mode:'markers',name:`${g}: ${fmt(Math.max(0,cn[g]))}`,x:xs,y:ys,z:zs,hoverinfo:'name',marker:{size:2,color:o.c,opacity:.8}})});
+  const L=document.getElementById('p3d_leo').checked?9500:45000, ax={visible:false,range:[-L,L]};
+  document.getElementById('p3d_note').textContent=`${esc(s.nazev)} · celkem ${fmt(tot)} aktivních družic USA+Čína · 1 tečka = ${SCALE} družic`;
+  Plotly.react('g_p_3d',tr,lay(`Simulace ${y} (${s.id}) – modelová ilustrace`,{scene:{xaxis:ax,yaxis:ax,zaxis:ax,aspectmode:'cube',bgcolor:'#0d1117',camera:{eye:{x:1.0,y:1.0,z:0.55}}},legend:{orientation:'h',itemsizing:'constant',y:0.02,font:{size:12}},margin:{t:50,l:0,r:0,b:0},uirevision:'keep'}));
+ }
+ let timer=null;
+ document.getElementById('p3d_play').onclick=()=>{if(timer){clearInterval(timer);timer=null;document.getElementById('p3d_play').textContent='▶ Přehrát 2026–2035';return}
+  const sl=document.getElementById('p3d_year');sl.value=2026;draw3d();document.getElementById('p3d_play').textContent='⏸ Zastavit';
+  timer=setInterval(()=>{if(+sl.value>=2035){clearInterval(timer);timer=null;document.getElementById('p3d_play').textContent='▶ Přehrát 2026–2035';return}sl.value=+sl.value+1;draw3d()},1200)};
+ document.getElementById('p3d_year').oninput=draw3d; document.getElementById('p3d_leo').onchange=draw3d;
+ function all(){const s=get(sel.value);document.getElementById('scen_desc').textContent=s.popis||'Vážený průměr všech scénářů podle jejich pravděpodobností (každý rok: Σ pravděpodobnost × hodnota).';
+  lines('starty',{x:[...hy,2026],USA:[...hU,P.zaklad.USA['2026_odhad']],'Čína':[...hC,P.zaklad['Čína']['2026_odhad']]},`Orbitální starty za rok – scénáře (vybrán ${s.id})`,'starty za rok');
+  lines('aktivni',{x:[...H.roky.filter(y=>y>=2010),2026],USA:[...H.pay_orbit.USA.slice(H.roky.indexOf(2010)),P.dnes.aktivni.USA],'Čína':[...H.pay_orbit['Čína'].slice(H.roky.indexOf(2010)),P.dnes.aktivni['Čína']]},`Družice na dráze / aktivní – scénáře (vybrán ${s.id})`,'počet družic',{yaxis:{title:'počet družic',type:'log'}});
+  konst();leo();draw3d();}
+ sel.onchange=all; all();
+ const n=(s,m,z,i)=>fmt(s[m][z][i]);
+ document.getElementById('scen_tab').innerHTML+=SC.map(s=>{const i30=YR.indexOf(2030),i35=YR.indexOf(2035);return `<tr><td><b style="color:${s.barva}">${s.id}</b> ${esc(s.nazev)}</td><td>${s.pst!=null?s.pst+' %':'–'}</td><td class="muted">${esc(s.popis||'Σ pravděpodobnost × hodnota scénáře')}</td>
+  <td><span class="us">${n(s,'starty','USA',i30)}</span> / <span class="cn">${n(s,'starty','Čína',i30)}</span> · <span class="us">${n(s,'starty','USA',i35)}</span> / <span class="cn">${n(s,'starty','Čína',i35)}</span></td>
+  <td><span class="us">${n(s,'aktivni','USA',i30)}</span> / <span class="cn">${n(s,'aktivni','Čína',i30)}</span> · <span class="us">${n(s,'aktivni','USA',i35)}</span> / <span class="cn">${n(s,'aktivni','Čína',i35)}</span></td>
+  <td>${fmt(s.leo.celkem[i30])} · ${fmt(s.leo.celkem[i35])}</td></tr>`}).join('');
+ const z=P.zaklad;
+ document.getElementById('metodika_pred').innerHTML=`<b>Metodika predikce (transparentně)</b><ol>
+ <li><b>Starty:</b> kotva = rok 2026 přepočtený na celý rok podle tempa do ${S.posledni_start_v_datech} (USA ${z.USA['2026_do_data']} → ${fmt(z.USA['2026_odhad'])}, Čína ${z['Čína']['2026_do_data']} → ${fmt(z['Čína']['2026_odhad'])}). Trend = průměrný roční růst (CAGR) 2021→2026: USA ${(100*z.USA.cagr_2021_2026e).toFixed(1)} %, Čína ${(100*z['Čína'].cagr_2021_2026e).toFixed(1)} %. V roce t: růst = CAGR × násobek scénáře × 0,8<sup>(t−2026)</sup> (růst se zpomaluje), případně jednorázový šok.</li>
+ <li><b>Aktivní družice</b> = 4 mega-konstelace + ostatní. Konstelace míří plynulou S-křivkou od dnešního stavu k cíli v roce 2035 (cíl = podíl oficiálního plánu; Starlink jako počet). Ostatní družice rostou o pevné % ročně podle scénáře.</li>
+ <li><b>Objekty v LEO:</b> dnešní katalog CelesTrak (${fmt(H.leo_dnes.PAY)} družic, ${fmt(H.leo_dnes['R/B'])} horních stupňů, ${fmt(H.leo_dnes.DEB)} úlomků); úlomky rostou o % ročně + jednorázové fragmentace (~3 000 úlomků, velikost čínského testu ASAT 2007); družice v LEO = dnešek + přírůstek modelovaných družic USA a Číny. ${esc(H.pozn)}</li>
+ <li><b>Pravděpodobnosti</b> (${P.scenare.map(s=>s.id+' '+s.pst+' %').join(', ')}) jsou <b>expertní odhad</b>, ne statistika. Vážený průměr = Σ pravděpodobnost × hodnota.</li>
+ <li>Nejistota je velká: model nezahrnuje např. počet družic na jeden start, rozdíl mezi „starty“ a vynesenou hmotností (Starship může vynést víc s méně starty) ani přesné plány jednotlivých firem. Všechny parametry jsou v souboru <code>predict.py</code> a v listu „scenare“ v databaze.xlsx.</li></ol>
+ <p>Plány konstelací: ${Object.entries(P.plany).map(([k,v])=>`${k}: ${esc(v.pozn)} <a href="${v.zdroj}" target="_blank">[zdroj]</a>`).join(' · ')}</p>`;
+}
+
+// ================= ŽIVÉ POZICE (satellite.js) =================
+const LV=S.live; window._liveTick=0;
+(function(){
+ const btn=document.getElementById('live_btn'), stt=document.getElementById('live_status');
+ if(!LV||!window.satellite){btn.disabled=true;stt.textContent='Živý režim není k dispozici (chybí data nebo knihovna satellite.js).';return;}
+ const COL={Starlink:'#1f6feb',Kuiper:'#a5d6ff','USA ostatní':US,'Čína konstelace':'#ffb3ad','Čína ostatní':CN,Stanice:'#ffd33d'};
+ const groups=[...new Set(LV.sats.map(s=>s.g))].sort((a,b)=>a=='Stanice'?1:b=='Stanice'?-1:0);
+ const recs=LV.sats.map(s=>({...s,rec:satellite.twoline2satrec(s.l1,s.l2)}));
+ let timer=null, baseTraces=null;
+ function compute(date){
+  const gm=satellite.gstime(date), out={};
+  groups.forEach(g=>out[g]={x:[],y:[],z:[],t:[]});
+  recs.forEach(s=>{const pv=satellite.propagate(s.rec,date); if(!pv||!pv.position) return;
+   const e=satellite.eciToEcf(pv.position,gm), gd=satellite.eciToGeodetic(pv.position,gm);
+   const o=out[s.g]; o.x.push(e.x);o.y.push(e.y);o.z.push(e.z);
+   o.t.push(`${s.n} (${s.z})<br>šířka ${satellite.degreesLat(gd.latitude).toFixed(1)}°, délka ${satellite.degreesLong(gd.longitude).toFixed(1)}°, výška ${Math.round(gd.height).toLocaleString('cs-CZ')} km`);
+   if(s.id==25544) window._iss={lat:satellite.degreesLat(gd.latitude),lon:satellite.degreesLong(gd.longitude),h:gd.height,x:e.x};});
+  return out;
+ }
+ function start(){
+  const gd=document.getElementById('g_globe'); baseTraces=baseTraces||gd.data.slice();
+  const earthT=gd.data.find(t=>t.type=='surface'), d=compute(new Date());
+  const tr=[earthT,...groups.map(g=>({type:'scatter3d',mode:g=='Stanice'?'markers+text':'markers',name:g=='Stanice'?'Stanice ISS / Tiangong':`${g} (${d[g].x.length})`,x:d[g].x,y:d[g].y,z:d[g].z,
+   text:g=='Stanice'?LV.sats.filter(s=>s.g=='Stanice').map(s=>s.id==25544?'ISS':'Tiangong'):d[g].t,hovertext:d[g].t,hoverinfo:'text',textposition:'top center',textfont:{color:'#ffd33d',size:13},
+   marker:g=='Stanice'?{size:7,color:COL[g],symbol:'diamond',line:{color:'#000',width:1}}:{size:2,color:COL[g],opacity:.85}}))];
+  Plotly.react('g_globe',tr,Object.assign({},gd.layout,{uirevision:'live',title:{text:`ŽIVĚ: vzorek ${LV.pocet} družic USA a Číny + stanice (výpočet v prohlížeči)`}}));
+  const idx=groups.map((g,i)=>i+1);
+  const tick=()=>{const now=new Date(), d=compute(now);
+   Plotly.restyle('g_globe',{x:groups.map(g=>d[g].x),y:groups.map(g=>d[g].y),z:groups.map(g=>d[g].z),hovertext:groups.map(g=>d[g].t)},idx);
+   window._liveTick++;
+   const i=window._iss; stt.innerHTML=`<b style="color:#3fb950">● ŽIVĚ</b> ${now.toLocaleTimeString('cs-CZ',{timeZone:'Europe/Prague'})} (Praha) · ISS: ${i?`${i.lat.toFixed(2)}°, ${i.lon.toFixed(2)}°, ${Math.round(i.h)} km`:'–'} · dráhy z CelesTrak (${esc(LV.stazeno||'?')}), přesnost klesá se stářím dat`;};
+  tick(); timer=setInterval(tick,1000); btn.textContent='⏸ Pauza';
+ }
+ function stop(){clearInterval(timer);timer=null;btn.textContent='● Živě';stt.innerHTML+=' <b>(pozastaveno)</b>';}
+ btn.onclick=()=>timer?stop():start();
+ window._liveStart=start;
+})();
+
+Object.keys(INFO).forEach(addInfo);
+
+const c=S.kontrola;
+document.getElementById('metod').innerHTML=`<ul>
+<li><b>Starty</b>: <a href="https://planet4589.org/space/gcat/">GCAT</a> launch.tsv, jen orbitální pokusy (LaunchCode O*); země = stát provozovatele startu dle GCAT orgs. Rocket Lab Electron (start z NZ, firma z USA) započten za USA (${yr}: ${S.rocketlab_nz_starty} startů).</li>
+<li><b>Křížová kontrola ${c.rok}</b> (Launch Library 2): SpaceX GCAT ${c.SpaceX.GCAT} vs LL2 ${c.SpaceX.LL2}; CASC GCAT ${c.CASC.GCAT} vs LL2 ${c.CASC.LL2}. Rozdíly vznikají klasifikací (např. suborbitální testy Starship, dceřiné firmy).</li>
+<li><b>Družice</b>: aktivní = v CelesTrak GP skupině „active“ (${S.aktivni_celkem_celestrak} objektů), země = SATCAT pole OWNER (US / PRC). Orbita z apogea/perigea/periody, typ odhadnut z názvu objektu (orientační).</li>
+<li><b>Nadcházející starty</b>: <a href="https://thespacedevs.com/llapi">Launch Library 2</a> (limit 15 dotazů/h, cache 6 h).</li>
+<li>Licence a podmínky komerčního použití zdrojů jsou v <a href="#licence">patičce</a>.</li>
+<li>Varování sanity kontroly: <span class="warn">${S.varovani.length?S.varovani.join('; '):'žádná'}</span></li></ul>`;
+</script></body></html>
